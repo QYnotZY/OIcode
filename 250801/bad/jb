@@ -1,0 +1,124 @@
+#include <cstring>
+#include <string>
+#include <stdio.h>
+#include <cmath>
+#include <algorithm>
+#include <iostream>
+#include <stack>
+#include <queue>
+#include <limits.h>
+#include <list>
+#include <set>
+#include <map>
+#include <unordered_map>
+#include <bitset>
+#include <random>
+#include <vector>
+using namespace std;
+#define INF 0x3f3f3f3f3f3f3f3fll
+#define IINF 0x3f3f3f3f
+#define DINF 10000000
+#define ll long long
+#define sc scanf
+#define pr printf
+#define v1 first
+#define v2 second
+#define lowbit(x) ((x)&(-x))
+class MT_gen {
+    const unsigned A = 2567483615u, B = 2636928640u, C = 4022730752u, F = 1812433253u;
+    unsigned MT[624], tot;
+    unsigned keep(unsigned index) { return index >= 624 ? index - 624 : index; }
+
+public:
+    MT_gen(unsigned seed) {
+        MT[0] = seed;
+        tot = 0;
+        for (int i = 1; i < 624; ++i) MT[i] = F * (MT[i - 1] ^ (MT[i - 1] >> 30)) + i;
+    }
+    void twist() {
+        for (int i = 0; i < 624; ++i) {
+            unsigned tmp = (MT[i] & 0x80000000) | (MT[keep(i + 1)] & 0x7fffffff);
+            tmp = (tmp & 1) ? (tmp >> 1) ^ A : (tmp >> 1);
+            MT[i] = MT[keep(i + 397)] ^ tmp;
+        }
+    }
+    unsigned operator()() {
+        if (tot == 0) twist();
+        unsigned tmp = MT[tot];
+        tmp ^= tmp >> 11;
+        tmp ^= tmp << 7 & B;
+        tmp ^= tmp << 15 & C;
+        tmp ^= tmp >> 18;
+        tot = keep(tot + 1);
+        return tmp;
+    }
+};
+const int N=2e7+5;
+char c[N];
+ll mod;
+ll inv[N],invf[N],f[N];
+ll po[N];
+void init() {
+    inv[0]=inv[1]=invf[0]=invf[1]=f[0]=f[1]=1;
+    po[0]=1,po[1]=2;
+    for (int i=2; i < N; i++) {
+        f[i]=f[i-1]*i%mod;
+        inv[i]=inv[mod%i]*(mod-mod/i)%mod;
+        invf[i]=invf[i-1]*inv[i]%mod;
+        po[i]=po[i-1]*2%mod;
+    }
+}
+ll C(ll n,ll m) {
+    if (n<0||m<0||n<m)return 0;
+    return f[n]*invf[m]%mod*invf[n-m]%mod;
+}
+ll C(ll x) {
+    return (C(2*x,x)-C(2*x,x-1)+mod)%mod;
+}
+// #define test
+ll lst,ff,lst2;
+ll now;
+ll n;
+ll query() {
+    return (lst+lst2*now%mod*f[n-1]%mod*f[n-1]%mod+ff*(n*n%mod-now+mod)%mod*f[n-1]%mod*f[n-1]%mod)%mod;
+}
+int main() {
+    freopen("bad.in","r",stdin);
+    freopen("bad.out","w",stdout);
+    unsigned seed;
+    int q;
+    std::cin >> n>>q >> mod >> seed;
+    MT_gen rnd(seed);
+    for (int i = 1; i <= n / 2; ++i) c[i] = '(';
+    for (int i = n / 2 + 1; i <= n; ++i) c[i] = ')';
+    for (int i = n; i >= 1; --i) std::swap(c[i], c[rnd() % i + 1]);
+#ifdef test
+    std::cout << c + 1 << std::endl;
+#endif
+    n>>=1;
+    init();
+    const ll inv2=(mod+1)>>1;
+    lst=C(n)*n%mod*(n-1)%mod*inv2%mod*n%mod*(n-1)%mod*f[n-2]%mod*f[n]%mod;
+    ff=((n+1)*C(2*n-1,n)%mod-po[2*n-1]+mod)%mod;
+    lst2=(n*n%mod*C(n)%mod-ff+mod)%mod;
+    ll tot=0;
+    for (int i=n*2; i >= 1; i--) {
+        if (c[i]==')')now=(now+tot)%mod;
+        else tot++;
+    }
+    pr("%lld\n",query());
+    while (q--) {
+        int x,y;
+        sc("%d%d",&x,&y);
+        if (x>y)swap(x,y);
+        if (c[x]!=c[y]) {
+            if (c[x]==')')
+                now=(now+x-y+mod)%mod;
+            else
+                now=(now+y-x+mod)%mod;
+            swap(c[x],c[y]);
+        }
+        pr("%lld\n",query());
+    }
+    return 0;
+}

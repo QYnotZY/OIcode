@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "g++ build",
+            "command": "D:\\Program Files\\TDM-GCC-64\\bin\\g++.exe",
+            "args": [//编译参数列表
+                "${file}",
+                "-fexec-charset=utf-8",
+                "-static-libgcc",
+                "-std=c++14",
+                "-g",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
