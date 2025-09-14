@@ -1,0 +1,15 @@
+Comparing files std.out and A.OUT
+***** std.out
+-1
+19
+***** A.OUT
+-1
+-1
+19
+*****
+
+***** std.out
+19
+***** A.OUT
+*****
+
